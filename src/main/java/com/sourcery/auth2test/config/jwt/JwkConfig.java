@@ -68,7 +68,6 @@ public class JwkConfig {
                     authorities.add(authority.getAuthority());
                 }
                 context.getClaims().claim("authorities", authorities);
-                context.getClaims().claim("test_claim", "Hello World!");
             }
         };
     }
