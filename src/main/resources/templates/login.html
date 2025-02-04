@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="/main.css">
 </head>
 <body>
 <div class="login-container">
@@ -24,18 +24,12 @@
             </div>
         </div>
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-        <div class="form-group">
-            <label for="remember-me">
-                <input type="checkbox" id="remember-me" name="remember-me">
-                Remember me
-            </label>
-        </div>
         <button type="submit" class="submit-button">Login</button>
     </form>
     <div class="register-container">
         <p>Don't have an account? <a href="#" onclick="redirectToRegister()">Register here!</a></p>
     </div>
 </div>
-<script src="scripts.js"></script>
+<script src="/scripts.js"></script>
 </body>
 </html>

@@ -115,7 +115,7 @@ public class SecurityConfig {
     public SecurityFilterChain defaultSecurityChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/main.css", "/login", "/error").permitAll()
+                        .requestMatchers("/main.css", "/login", "/error", "/scripts.js").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -168,7 +168,7 @@ public class SecurityConfig {
                 .postLogoutRedirectUri("http://localhost:5173/")
                 .scope(OidcScopes.OPENID)
                 .scope(OidcScopes.PROFILE)
-                .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
+                .clientSettings(ClientSettings.builder().requireAuthorizationConsent(false).build())
                 .tokenSettings(TokenSettings.builder()
                         .accessTokenTimeToLive(Duration.ofMinutes(15))
                         .refreshTokenTimeToLive(Duration.ofDays(30))
