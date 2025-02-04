@@ -1,4 +1,4 @@
-package com.sourcery.auth2test.config.jwt;
+package com.sourcery.auth2test.security.token;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;

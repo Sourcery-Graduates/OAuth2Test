@@ -1,9 +1,9 @@
 package com.sourcery.auth2test.config;
 
-import com.sourcery.auth2test.config.jwt.CookieOAuth2TokenResponseHandler;
-import com.sourcery.auth2test.config.jwt.PublicClientRefreshProvider;
-import com.sourcery.auth2test.config.jwt.PublicClientRefreshTokenAuthenticationConverter;
-import com.sourcery.auth2test.config.jwt.RefreshTokenCookieAuthenticationConverter;
+import com.sourcery.auth2test.security.token.CookieOAuth2TokenResponseHandler;
+import com.sourcery.auth2test.security.client_auth.PublicClientRefreshProvider;
+import com.sourcery.auth2test.security.client_auth.PublicClientRefreshTokenAuthenticationConverter;
+import com.sourcery.auth2test.security.token.RefreshTokenCookieAuthenticationConverter;
 import java.time.Duration;
 import java.util.List;
 import java.util.UUID;

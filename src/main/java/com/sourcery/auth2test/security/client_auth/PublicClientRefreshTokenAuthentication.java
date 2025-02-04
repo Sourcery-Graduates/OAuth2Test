@@ -1,4 +1,4 @@
-package com.sourcery.auth2test.config.jwt;
+package com.sourcery.auth2test.security.client_auth;
 
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2ClientAuthenticationToken;

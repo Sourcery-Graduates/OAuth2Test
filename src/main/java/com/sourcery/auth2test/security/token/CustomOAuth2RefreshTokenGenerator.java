@@ -1,4 +1,4 @@
-package com.sourcery.auth2test.config.jwt;
+package com.sourcery.auth2test.security.token;
 
 import jakarta.annotation.Nullable;
 import java.time.Instant;

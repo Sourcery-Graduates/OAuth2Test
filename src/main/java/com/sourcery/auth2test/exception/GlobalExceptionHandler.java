@@ -1,4 +1,4 @@
-package com.sourcery.auth2test.config.exception;
+package com.sourcery.auth2test.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

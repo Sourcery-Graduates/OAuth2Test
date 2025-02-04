@@ -1,10 +1,11 @@
-package com.sourcery.auth2test.config.jwt;
+package com.sourcery.auth2test.config;
 
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jose.jwk.JWKSet;
+import com.sourcery.auth2test.security.token.CustomOAuth2RefreshTokenGenerator;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
