@@ -1,5 +1,6 @@
 package com.sourcery.auth2test.config;
 
+import com.sourcery.auth2test.config.jwt.CookieOAuth2TokenResponseHandler;
 import com.sourcery.auth2test.config.jwt.PublicClientRefreshProvider;
 import com.sourcery.auth2test.config.jwt.PublicClientRefreshTokenAuthenticationConverter;
 import java.time.Duration;
@@ -26,6 +27,7 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
@@ -53,7 +55,8 @@ public class SecurityConfig {
     @Order(1)
     public SecurityFilterChain authorizationServerSecurityChain(HttpSecurity httpSecurity,
                                                                 RegisteredClientRepository registeredClientRepository,
-                                                                OAuth2TokenGenerator<OAuth2Token> tokenGenerator)
+                                                                OAuth2TokenGenerator<OAuth2Token> tokenGenerator,
+                                                                JwtDecoder jwtDecoder)
             throws Exception {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(httpSecurity);
 
@@ -61,20 +64,29 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers
-                        .httpStrictTransportSecurity(HeadersConfigurer.HstsConfig::disable) // disabling HTTPS - not for prod
+                        .httpStrictTransportSecurity(HeadersConfigurer.HstsConfig::disable) // TODO: disabling HTTPS - NOT FOR PROD
         );
 
         httpSecurity
                 .getConfigurer(OAuth2AuthorizationServerConfigurer.class)
                 .clientAuthentication(authentication -> {
                     authentication.authenticationConverter(
-                            new PublicClientRefreshTokenAuthenticationConverter());
+                            new PublicClientRefreshTokenAuthenticationConverter(
+                                    jwtDecoder
+                            ));
                     authentication.authenticationProvider(
                             new PublicClientRefreshProvider(registeredClientRepository));
                 })
                 .tokenGenerator(tokenGenerator)
                 .oidc(Customizer.withDefaults());
 
+        // return refresh token in cookies, access in body
+        httpSecurity.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
+                .tokenEndpoint(tokenEndpoint -> tokenEndpoint
+                        .accessTokenResponseHandler(new CookieOAuth2TokenResponseHandler())
+                );
+
+        // in case or exceptions redirect to login page -> not sure if good idea
         httpSecurity
                 .exceptionHandling(exception -> exception.defaultAuthenticationEntryPointFor(
                 new LoginUrlAuthenticationEntryPoint("/login"),
@@ -170,8 +182,8 @@ public class SecurityConfig {
                 .scope(OidcScopes.PROFILE)
                 .clientSettings(ClientSettings.builder().requireAuthorizationConsent(false).build())
                 .tokenSettings(TokenSettings.builder()
-                        .accessTokenTimeToLive(Duration.ofMinutes(15))
-                        .refreshTokenTimeToLive(Duration.ofDays(30))
+                        .accessTokenTimeToLive(Duration.ofMinutes(5))
+                        .refreshTokenTimeToLive(Duration.ofDays(7))
                         .build())
                 .build();
 

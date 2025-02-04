@@ -21,18 +21,15 @@ public class PublicClientRefreshProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws
             AuthenticationException {
-        PublicClientRefreshTokenAuthentication
-                publicClientRefreshTokenAuthentication =
+        PublicClientRefreshTokenAuthentication refreshTokenAuth =
                 (PublicClientRefreshTokenAuthentication) authentication;
 
-        if (!ClientAuthenticationMethod.NONE.equals(
-                publicClientRefreshTokenAuthentication.getClientAuthenticationMethod())) {
+        if (!ClientAuthenticationMethod.NONE.equals(refreshTokenAuth.getClientAuthenticationMethod())) {
             return null;
         }
 
-        String clientId = publicClientRefreshTokenAuthentication.getPrincipal().toString();
-        RegisteredClient registeredClient =
-                registeredClientRepository.findByClientId(clientId);
+        String clientId = refreshTokenAuth.getPrincipal().toString();
+        RegisteredClient registeredClient = registeredClientRepository.findByClientId(clientId);
 
         if (registeredClient == null) {
             throw new OAuth2AuthenticationException(new OAuth2Error(
@@ -42,7 +39,7 @@ public class PublicClientRefreshProvider implements AuthenticationProvider {
         }
 
         if (!registeredClient.getClientAuthenticationMethods().contains(
-                publicClientRefreshTokenAuthentication.getClientAuthenticationMethod())) {
+                refreshTokenAuth.getClientAuthenticationMethod())) {
             throw new OAuth2AuthenticationException(new OAuth2Error(
                     OAuth2ErrorCodes.INVALID_CLIENT,
                     "authentication_method is not registered with client",
