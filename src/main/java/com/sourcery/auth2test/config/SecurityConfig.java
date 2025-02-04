@@ -3,6 +3,7 @@ package com.sourcery.auth2test.config;
 import com.sourcery.auth2test.config.jwt.CookieOAuth2TokenResponseHandler;
 import com.sourcery.auth2test.config.jwt.PublicClientRefreshProvider;
 import com.sourcery.auth2test.config.jwt.PublicClientRefreshTokenAuthenticationConverter;
+import com.sourcery.auth2test.config.jwt.RefreshTokenCookieAuthenticationConverter;
 import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
@@ -27,7 +28,6 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
@@ -55,8 +55,7 @@ public class SecurityConfig {
     @Order(1)
     public SecurityFilterChain authorizationServerSecurityChain(HttpSecurity httpSecurity,
                                                                 RegisteredClientRepository registeredClientRepository,
-                                                                OAuth2TokenGenerator<OAuth2Token> tokenGenerator,
-                                                                JwtDecoder jwtDecoder)
+                                                                OAuth2TokenGenerator<OAuth2Token> tokenGenerator)
             throws Exception {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(httpSecurity);
 
@@ -71,9 +70,7 @@ public class SecurityConfig {
                 .getConfigurer(OAuth2AuthorizationServerConfigurer.class)
                 .clientAuthentication(authentication -> {
                     authentication.authenticationConverter(
-                            new PublicClientRefreshTokenAuthenticationConverter(
-                                    jwtDecoder
-                            ));
+                            new PublicClientRefreshTokenAuthenticationConverter());
                     authentication.authenticationProvider(
                             new PublicClientRefreshProvider(registeredClientRepository));
                 })
@@ -84,7 +81,9 @@ public class SecurityConfig {
         httpSecurity.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
                 .tokenEndpoint(tokenEndpoint -> tokenEndpoint
                         .accessTokenResponseHandler(new CookieOAuth2TokenResponseHandler())
+                        .accessTokenRequestConverter(new RefreshTokenCookieAuthenticationConverter())
                 );
+
 
         // in case or exceptions redirect to login page -> not sure if good idea
         httpSecurity
@@ -182,8 +181,8 @@ public class SecurityConfig {
                 .scope(OidcScopes.PROFILE)
                 .clientSettings(ClientSettings.builder().requireAuthorizationConsent(false).build())
                 .tokenSettings(TokenSettings.builder()
-                        .accessTokenTimeToLive(Duration.ofMinutes(5))
-                        .refreshTokenTimeToLive(Duration.ofDays(7))
+                        .accessTokenTimeToLive(Duration.ofSeconds(15))
+                        .refreshTokenTimeToLive(Duration.ofSeconds(30))
                         .build())
                 .build();
 
