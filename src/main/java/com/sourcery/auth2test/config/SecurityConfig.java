@@ -7,7 +7,6 @@ import com.sourcery.auth2test.security.token.RefreshTokenCookieAuthenticationCon
 import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -40,6 +39,7 @@ import org.springframework.security.oauth2.server.authorization.token.OAuth2Toke
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -48,8 +48,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 @EnableMethodSecurity
 @Configuration
-@RequiredArgsConstructor
 public class SecurityConfig {
+
 
     @Bean
     @Order(1)
@@ -125,19 +125,27 @@ public class SecurityConfig {
     @Order(3)
     public SecurityFilterChain defaultSecurityChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/oauth2/logout"))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/main.css", "/login", "/error", "/scripts.js").permitAll()
+                        .requestMatchers("/main.css", "/login", "/error", "/scripts.js",
+                                "/oauth2/logout").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login") // Кастомная страница логина
                         .loginProcessingUrl("/login") // Обработка данных логина
                         .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/oauth2/logout")
+                        .addLogoutHandler(new CookieClearingLogoutHandler("refresh_token"))
+                        .logoutSuccessUrl("http://localhost:5173/") // redirect to FE after success
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
                 );
 
         return httpSecurity.build();
     }
-
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
