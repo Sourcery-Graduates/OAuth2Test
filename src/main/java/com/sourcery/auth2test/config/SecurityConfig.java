@@ -139,7 +139,6 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/oauth2/logout")
                         .addLogoutHandler(new CookieClearingLogoutHandler("refresh_token"))
-                        .logoutSuccessUrl("http://localhost:5173/") // redirect to FE after success
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
                 );
@@ -150,7 +149,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
@@ -183,8 +182,8 @@ public class SecurityConfig {
                 .clientAuthenticationMethod(ClientAuthenticationMethod.NONE) // authorization + PKCE
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .redirectUri("http://localhost:5173/")
-                .postLogoutRedirectUri("http://localhost:5173/")
+                .redirectUri("http://localhost:3000/")
+                .postLogoutRedirectUri("http://localhost:3000/")
                 .scope(OidcScopes.OPENID)
                 .scope(OidcScopes.PROFILE)
                 .clientSettings(ClientSettings.builder().requireAuthorizationConsent(false).build())
